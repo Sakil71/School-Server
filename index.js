@@ -112,7 +112,7 @@ async function run() {
         })
 
         app.get('/apply', async (req, res) => {
-            const apply = await applyCollections.find({}).toArray();
+            const apply = (await applyCollections.find({}).toArray()).reverse();
             res.send(apply);
         })
 
@@ -131,16 +131,23 @@ async function run() {
             res.send(result);
         })
 
-        app.patch('/apply/confirm/:id', async(req, res)=>{
+        app.patch('/apply/confirm/:id', async (req, res) => {
             const id = req.params.id;
-            const filter = {_id : new ObjectId(id)};
-            const options =  {upsert : true};
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
             const updateDoc = {
-                $set : {
-                    confirm : 'confirmed'
+                $set: {
+                    confirm: 'confirmed'
                 }
             }
             const result = await applyCollections.updateOne(filter, updateDoc, options);
+            res.send(result);
+        })
+
+        app.get('/students/:admissionClass', async (req, res) => {
+            const admissionClass = req.params.admissionClass;
+            const query = { admissionClass };
+            const result = await applyCollections.find(query).toArray();
             res.send(result);
         })
 
@@ -151,14 +158,21 @@ async function run() {
             res.send(result);
         })
 
-        app.post('/notices', async(req, res)=>{
+        app.post('/notices', async (req, res) => {
             const notices = req.body;
             const result = await noticesCollections.insertOne(notices);
             res.send(result);
         })
 
-        app.get('/notices', async(req, res)=>{
-            res.send(await noticesCollections.find({}).toArray());
+        app.get('/notices', async (req, res) => {
+            res.send((await noticesCollections.find({}).toArray()).reverse());
+        })
+
+        app.delete('/notices/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await noticesCollections.deleteOne(query);
+            res.send(result);
         })
 
         // app.get('/jwt', async(req, res) =>{
