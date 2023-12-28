@@ -43,6 +43,7 @@ async function run() {
     const teachersCollections = client.db('school').collection('teacher');
     const usersCollections = client.db('school').collection('user');
     const noticesCollections = client.db('school').collection('notices');
+    const academicTopicsCollections = client.db('school').collection('academicTopic');
 
     try {
         app.post('/teacher', async (req, res) => {
@@ -174,6 +175,19 @@ async function run() {
             const result = await noticesCollections.deleteOne(query);
             res.send(result);
         })
+
+        app.post('/topic', async(req, res)=>{
+            const topics = req.body;
+            const result = await academicTopicsCollections.insertOne(topics);
+            res.send(result);
+        })
+        app.get('/topic/:classes', async(req, res)=>{
+            const classes = req.params.classes;
+            const query = {classes};
+            const result = (await academicTopicsCollections.find(query).toArray()).reverse();
+            res.send(result);
+        })
+
 
         // app.get('/jwt', async(req, res) =>{
         //     const email = req.params.email;
